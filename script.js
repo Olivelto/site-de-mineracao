@@ -38,6 +38,36 @@ document.getElementById('startLtcMining').addEventListener('click', function() {
     startMining('Litecoin');
 });
 
+document.getElementById('startLtcMining').addEventListener('click', function() {
+    getLtcMiningStats();
+});
+
+function getLtcMiningStats() {
+    const ltcStatsDiv = document.getElementById('ltcMiningStats');
+    ltcStatsDiv.innerHTML = 'Fetching Litecoin mining stats...';
+
+    fetch('https://www.litecoinpool.org/api?api_key=c370d81967bfe3ac88c4ea83a7b8a176&action=stats')
+        .then(response => response.json())
+        .then(data => {
+            const stats = data.stats;
+            const hashrate = stats.hashrate;
+            const miners = stats.miners;
+            const ltcEarned = stats.round_shares * stats.reward / 1e8; // Convertendo de Satoshis para Litecoin
+
+            ltcStatsDiv.innerHTML = `
+                <h3>Litecoin Mining Statistics</h3>
+                <p>Hashrate: ${hashrate} MH/s</p>
+                <p>Miners: ${miners}</p>
+                <p>Litecoin Earned: ${ltcEarned.toFixed(5)} LTC</p>
+            `;
+        })
+        .catch(error => {
+            ltcStatsDiv.innerHTML = 'Error fetching Litecoin mining stats.';
+            console.error('Error fetching Litecoin mining stats:', error);
+        });
+}
+
+
 function startMining(crypto) {
     // Simulação de mineração
     const statsDiv = document.getElementById(`${crypto.toLowerCase()}MiningStats`);
